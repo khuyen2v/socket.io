@@ -90,7 +90,6 @@ var findDocuments = function(db, callback) {
   collection.find({}).toArray(function(err, docs) {
     assert.equal(err, null);
     console.log("Found the following records");
-    console.dir(docs);
     callback(docs);
   });
 }
