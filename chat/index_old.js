@@ -1,27 +1,11 @@
-// Setup basic express server
-var express = require('express');
-var app = express();
-var server = require('http').createServer(app);
-var io = require('../..')(server);
-var port = process.env.PORT || 3000;
-
-server.listen(port, function () {
-  console.log('Server listening at port %d', port);
-});
-
-// Routing
-app.use(express.static(__dirname + '/public'));
-
-// Chatroom
-
-var numUsers = 0;
-
-io.on('connection', function (socket) {
+function listen(socket) {
   var addedUser = false;
 
   // when the client emits 'new message', this listens and executes
   socket.on('new message', function (data) {
     // we tell the client to execute 'new message'
+    console.log(socket.username + ': ' + data);
+    console.log(socket.rooms);
     socket.broadcast.emit('new message', {
       username: socket.username,
       message: data
@@ -40,6 +24,7 @@ io.on('connection', function (socket) {
       numUsers: numUsers
     });
     // echo globally (all clients) that a person has connected
+    console.log('add user: ' +username);
     socket.broadcast.emit('user joined', {
       username: socket.username,
       numUsers: numUsers
@@ -62,6 +47,7 @@ io.on('connection', function (socket) {
 
   // when the user disconnects.. perform this
   socket.on('disconnect', function () {
+    console.log('disconnect: ' + socket.username);
     if (addedUser) {
       --numUsers;
 
@@ -72,4 +58,26 @@ io.on('connection', function (socket) {
       });
     }
   });
+}
+// Setup basic express server
+var express = require('express');
+var app = express();
+var server = require('http').createServer(app);
+var io = require('..')(server);
+var port = process.env.PORT || 3000;
+
+server.listen(port, function () {
+  console.log('Server listening at port %d', port);
 });
+
+// Routing
+app.use(express.static(__dirname + '/public'));
+
+// Chatroom
+
+var numUsers = 0;
+var nsp = io.of('/my-namespace');
+var nsp1 = io.of('/my-room');
+nsp.on('connection', listen);
+nsp1.on('connection', listen);
+
