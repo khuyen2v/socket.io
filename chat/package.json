@@ -8,6 +8,8 @@
   "license": "BSD",
   "dependencies": {
     "express": "4.13.4",
-    "mongodb": "~2.0"
+    "mongodb": "~2.0",
+    "mongoose": "~4.5.0",
+    "mongoose-auto-increment": "~3.0.0"
   }
 }
