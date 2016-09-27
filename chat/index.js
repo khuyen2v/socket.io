@@ -1,6 +1,6 @@
 require('./lib/Connect');
 var Category = require('./models/Category');
-var Course = require('./models/course');
+var Course = require('./models/Course');
 var Message = require('./models/Message');
 
 var numUsers = 0;
