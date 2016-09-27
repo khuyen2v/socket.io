@@ -36,19 +36,33 @@ function listen(socket) {
     });
 
     //message command
-    socket.on('cmd', function (cmd, username, ids) {
+    socket.on('cmd', function (cmd, username, id) {
         // we tell the client to execute 'new message'
-        console.log(username + '(' + ids + '):' + cmd);
+        console.log(username + '(' + id + '):' + cmd);
         switch (cmd) {
             case 'delete':
-                console.log('delete:' + ids);
-                Message.findOne({ids: ids}, function (err, doc) {
+                console.log('delete:' + id);
+                Message.findOne({ids: id}, function (err, doc) {
                     doc.status = 0;
                     doc.save();
-                    console.log('Removed: ' + ids);
+                    console.log('Removed: ' + id);
                     socket.broadcast.emit('cmd', {
                         username: username,
-                        message: cmd + ':' + ids
+                        message: cmd + ':' + id
+                    });
+                });
+                break;
+
+            case 'delete_all':
+                console.log('delete_all:' + id);
+                Message.update({room_iid: id}, {$set: {status: 0}}, {multi: true}, function (error) {
+                    if (error) {
+                        console.error('ERROR!');
+                        return;
+                    }
+                    socket.broadcast.emit('cmd', {
+                        username: username,
+                        message: cmd + ':' + id
                     });
                 });
                 break;
