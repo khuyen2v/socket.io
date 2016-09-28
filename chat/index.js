@@ -71,7 +71,15 @@ function listen(socket) {
         }
 
     });
-
+    //message command
+    socket.on('ping_room', function (namespace) {
+        // we tell the client to execute 'new message'
+        console.log('ping_room:' + namespace, countUsers,typeof countUsers['/' + namespace]);
+        if (typeof countUsers['/' + namespace] == 'undefined') {
+            console.log('create room:' + namespace);
+            io.of('/' + namespace).on('connection', listen);
+        }
+    });
     // when the client emits 'add user', this listens and executes
     socket.on('add user', function (username) {
         if (addedUser) return;
@@ -135,17 +143,21 @@ server.listen(port, function () {
 // Routing
 app.use(express.static(__dirname + '/public'));
 
+//master room
+io.of('/master').on('connection', listen);
+
 //find all course
+/*
 Course.find({}, function (err, courses) {
     if (err) return console.error(err);
     var count = 0;
     for (var index in courses) {
         count++;
         //create a room chat
-        io.of('/' + courses[index].iid).on('connection', listen);
+         io.of('/' + courses[index].iid).on('connection', listen);
     }
 });
-
+*/
 //room chat for test
 var nsp = io.of('/my-namespace');
 var nsp1 = io.of('/my-room');
